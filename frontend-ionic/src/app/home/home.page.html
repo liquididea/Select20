@@ -143,6 +143,7 @@
                 <div class="title" contenteditable="true" (keyup.enter)="changeSummary($event, relatedTodo)">
                   {{relatedTodo.title}}
                 </div>
+
                 <a *ngIf="getURL(todo.title) != 'none' " [href]="getURL(relatedTodo.title)" target="_blank">
                   <ion-icon name="link" class="subtaskbutton"></ion-icon>
                 </a>
@@ -153,6 +154,10 @@
                     <ion-icon name="repeat"></ion-icon>
                   </span>
                   {{formatDate(relatedTodo)}}
+                </div>
+                <div class="chip" *ngIf="relatedTodo.duration != 30">
+                  <ion-icon name="hourglass"></ion-icon>
+                  {{relatedTodo.duration}}m
                 </div>
               </div>
             </div>

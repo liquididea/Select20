@@ -26,7 +26,7 @@ class TodoController extends Controller
             return response(['message' => 'Not authorized'], 401);
         }
 
-        $this->saveHistory("View " . $request->list);
+        # $this->saveHistory("View " . $request->list);
 
         $curl_tasks = curl_init();
         curl_setopt($curl_tasks, CURLOPT_URL, $user->nextcloudurl . $request->list);
@@ -34,9 +34,7 @@ class TodoController extends Controller
         curl_setopt(
             $curl_tasks,
             CURLOPT_POSTFIELDS,
-            '<c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><d:getetag />
-            <c:calendar-data /> </d:prop><c:filter><c:comp-filter name="VCALENDAR"><c:comp-filter name="VTODO" /></c:comp-filter>
-            </c:filter></c:calendar-query>'
+            '<c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><d:getetag />    <c:calendar-data />  </d:prop>  <c:filter>    <c:comp-filter name="VCALENDAR">      <c:comp-filter name="VTODO">        <c:prop-filter name="STATUS">          <c:text-match negate-condition="yes">COMPLETED</c:text-match>        </c:prop-filter>      </c:comp-filter>    </c:comp-filter>  </c:filter></c:calendar-query>'
         );
         curl_setopt($curl_tasks, CURLOPT_RETURNTRANSFER, true);
 
@@ -68,8 +66,22 @@ class TodoController extends Controller
         $this->saveHistory("View habit-matrix");
 
         $user_id = $user->id;
-        $data = DB::select(DB::raw($sql), array('userid' => $user_id));
+        $data = DB::select(DB::raw($sql)->getValue(DB::connection()->getQueryGrammar(), array('userid' => $user_id)));
         return response($data);
+    }
+
+
+    public function getRandomString($n)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomString = '';
+
+        for ($i = 0; $i < $n; $i++) {
+            $index = rand(0, strlen($characters) - 1);
+            $randomString .= $characters[$index];
+        }
+
+        return $randomString;
     }
 
     public function update(Request $request)
@@ -82,7 +94,7 @@ class TodoController extends Controller
                 'ical' => 'required|string|min:20|max:10000',
             ]);
         if ($validator->fails()) {
-            return response(['error' => $validator->errors(), 'Validaton Error'], 400);
+            return response(['error' => $validator->errors(), 'Validation Error'], 400);
         }
 
         $user = JWTAuth::user();
