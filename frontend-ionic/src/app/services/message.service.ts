@@ -13,7 +13,7 @@ export class MessageService {
       const toast = await this.toastController.create({
         color: !isError ? 'dark' : 'danger',
         header: message,
-        position: 'top',
+        positionAnchor: "mainPane",
         duration: 4000,
       });
       toast.present();
